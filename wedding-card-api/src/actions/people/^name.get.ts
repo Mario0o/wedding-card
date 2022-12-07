@@ -1,39 +1,25 @@
-import { Inject } from "@sfajs/inject";
-import { Action } from "@sfajs/router";
+import { Inject } from "@ipare/inject";
+import { Param } from "@ipare/pipe";
+import { Action } from "@ipare/router";
 import { CollectionService } from "../../services/collection.service";
+import { V } from "@ipare/validator";
+import { FindNameResultDto } from "../../dtos/find-name-result.dto";
 
-/**
- * @openapi
- * /people/{name}:
- *   get:
- *     tags:
- *       - people
- *     description: Whether a person exists or not
- *     parameters:
- *       - name: name
- *         required: true
- *         in: path
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: success
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 exist:
- *                   type: bool
- *                   description: result
- */
+@V()
+  .Tags("people")
+  .Summary("Whether a person exists or not")
+  .Response(200, FindNameResultDto)
+  .ResponseDescription(200, "success")
 export default class extends Action {
   @Inject
   private readonly collectionService!: CollectionService;
 
+  @Param("name")
+  @V().IsOptional().MaxLength(20).Description("name")
+  private readonly name!: string;
+
   async invoke(): Promise<void> {
-    const name = this.ctx.req.params.name;
-    if (!name) {
+    if (!this.name) {
       this.ok({
         exist: false,
       });
@@ -42,7 +28,7 @@ export default class extends Action {
 
     const countRes = await this.collectionService.people
       .where({
-        _id: name,
+        _id: this.name,
       })
       .count();
     this.ok({

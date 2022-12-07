@@ -1,6 +1,6 @@
 {
   "name": "wedding-card",
-  "description": "结婚喜帖",
+  "description": "电子喜帖",
   "homepage": "https://github.com/hal-wang/wedding-card",
   "repository": {
     "type": "git",
@@ -10,9 +10,7 @@
     "deploy": "tcb login && tcb framework deploy --mode local"
   },
   "keywords": [
-    "sfa",
-    "@sfajs/router",
-    "@sfajs/cloudbase",
+    "ipare",
     "wedding",
     "cloudbase",
     "restful-api",
@@ -25,5 +23,8 @@
     "email": "support@hal.wang"
   },
   "author": "hal-wang",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@cloudbase/cli": "^1.12.4"
+  }
 }

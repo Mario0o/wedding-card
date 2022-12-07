@@ -1,43 +1,24 @@
-import { Action } from "@sfajs/router";
-import { Inject } from "@sfajs/inject";
+import { Action } from "@ipare/router";
+import { Inject } from "@ipare/inject";
 import { CbappService } from "../../services/cbapp.service";
+import { Param } from "@ipare/pipe";
+import { V } from "@ipare/validator";
 
-/**
- * @openapi
- * /res/{type}:
- *   get:
- *     tags:
- *       - res
- *     description: Get cloud storage resources
- *     parameters:
- *       - name: type
- *         required: true
- *         in: path
- *         schema:
- *           type: string
- *           default: favicon
- *           enum:
- *             - album
- *             - music
- *             - cover
- *             - favicon
- *     responses:
- *       200:
- *         description: success
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *       400:
- *         description: Can't find environment variable, or the type is error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- */
+@V()
+  .Summary("Get cloud storage resources")
+  .Tags("res")
+  .ResponseDescription(200, "success")
+  .ResponseDescription(
+    400,
+    "Can't find environment variable, or the type is error"
+  )
 export default class extends Action {
   @Inject
   private readonly cbappService!: CbappService;
+
+  @Param("type")
+  @V().Enum("album", "music", "cover", "favicon")
+  private readonly type!: string;
 
   private async getCloudPath(): Promise<string> {
     const tempFile = "t";
@@ -50,10 +31,9 @@ export default class extends Action {
   cloudPath!: string;
 
   async invoke(): Promise<void> {
-    const type = this.ctx.req.params.type;
     this.cloudPath = await this.getCloudPath();
 
-    switch (type) {
+    switch (this.type) {
       case "album":
         const albumStr = process.env.ALBUM;
         if (!albumStr) {
